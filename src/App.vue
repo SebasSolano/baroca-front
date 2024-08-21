@@ -1,5 +1,13 @@
 <script setup></script>
 
 <template>
-  <router-view />
+  <a-config-provider
+    :theme="{
+      token: {
+        colorPrimary: '#410099',
+      },
+    }"
+  >
+    <router-view />
+  </a-config-provider>
 </template>

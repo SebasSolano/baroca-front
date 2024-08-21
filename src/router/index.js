@@ -7,13 +7,17 @@ const routes = [
     component: Main,
     children: [
       {
-        path: "",
+        path: "/pre-registration",
         component: () => import("../views/PreRegistration.vue"),
       },
     ],
   },
   {
     path: "/reserve",
+    component: () => import("../views/Reserve.vue"),
+  },
+  {
+    path: "/reserve:id",
     component: () => import("../views/Reserve.vue"),
   },
 ];
