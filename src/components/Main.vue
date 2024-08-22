@@ -17,7 +17,10 @@
       <div
         class="h-20 flex items-center justify-center sm:justify-start space-x-3"
       >
-        <img class="w-14 rounded" src="../assets/images/baroca.png" />
+        <router-link to="/">
+          <img class="w-14 rounded" src="../assets/images/baroca.png" />
+          </router-link
+        >
         <h1 class="text-white text-xl">{{ titlePage }}</h1>
       </div>
     </a-layout-header>
@@ -26,9 +29,16 @@
         class="rounded-xl"
         :style="{ background: '#fff', padding: '24px', minHeight: '500px' }"
       >
-        <p v-if="isMainPage" class="w-full text-2xl text-zinc-500">Elige la opcion necesaria:</p>
+      <router-view v-show="!isMainPage" v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <Component :is="Component" />
+          </transition>
+        </router-view>
+        <p v-if="isMainPage" class="w-full text-2xl text-zinc-500">
+          Elige la opcion necesaria:
+        </p>
         <div
-        v-show="isMainPage"
+          v-show="isMainPage"
           class="flex justify-center items-center flex-col space-y-5 sm:flex-row sm:space-x-10 sm:space-y-0 mt-20"
         >
           <router-link
@@ -45,11 +55,7 @@
           </router-link>
         </div>
 
-        <router-view v-show="!isMainPage" v-slot="{ Component }">
-          <transition name="grow-in">
-            <Component :is="Component" />
-          </transition>
-        </router-view>
+
       </div>
     </a-layout-content>
     <a-layout-footer
