@@ -123,22 +123,18 @@
 
     <div
       v-show="status"
-     class="w-full flex flex-col items-center justify-center fade-in slide-down"
+      class="w-full flex flex-col items-center justify-center slide-down"
     >
       <p class="text-gray-500">Informacion adicional:</p>
-      <a-form
-        class="w-full"
-        layout="horizontal"
-        style="max-width: 600px"
-      >
+      <a-form class="w-full" layout="horizontal" style="max-width: 600px">
         <a-form-item>
-            <div class="flex flex-col w-full space-y-3">
-              <label>Correo:</label>
-              <a-input size="large" />
-            </div>
+          <div class="flex flex-col w-full space-y-3">
+            <label>Correo:</label>
+            <a-input size="large" />
+          </div>
         </a-form-item>
         <a-form-item>
-          <div class="flex flex-row justify-center space-x-5 ">
+          <div class="flex flex-row justify-center space-x-5">
             <div class="flex flex-col w-full space-y-3">
               <label>Nombre:</label>
               <a-input size="large" />
@@ -149,15 +145,18 @@
             </div>
           </div>
         </a-form-item>
-        <a-form-item label="Select">
+        <a-form-item label="Origen (Nacionalidad):">
           <a-select>
-            <a-select-option value="demo">Demo</a-select-option>
+            <a-select-option value="demo">Colombia</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="DatePicker">
           <a-date-picker />
         </a-form-item>
         <a-form-item label="InputNumber">
+          <a-select>
+            <a-select-option value="demo">Colombia</a-select-option>
+          </a-select>
           <a-input-number />
         </a-form-item>
         <a-form-item label="Primera vez?">
@@ -172,29 +171,29 @@
 </template>
 
 <style scoped>
-@keyframes fade-in {
-  from {
-    opacity: 0;
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
-  to {
-    opacity: 1;
-  }
-}
 
-@keyframes slide-down {
-  from {
-    transform: translateY(-20px);
+  @keyframes slide-down {
+    from {
+      transform: translateY(-20px);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
-  to {
-    transform: translateY(0);
+
+  .fade-in {
+    animation: fade-in 2s forwards;
   }
-}
 
-.fade-in {
-  animation: fade-in 0.8s forwards;
-}
-
-.slide-down {
-  animation: slide-down 0.5s forwards;
-}
+  .slide-down {
+    animation: slide-down 1s forwards;
+  }
 </style>

@@ -48,7 +48,7 @@
             Pre-Registro
           </router-link>
           <router-link
-            to="/"
+            to="/reserve"
             class="mechanical-btn flex items-center justify-center hover:text-black bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
           >
             Reserva
