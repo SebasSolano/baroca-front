@@ -30,7 +30,7 @@
         :style="{ background: '#fff', padding: '24px', minHeight: '500px' }"
       >
       <router-view v-show="!isMainPage" v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
+          <transition name="grow-in" mode="out-in">
             <Component :is="Component" />
           </transition>
         </router-view>
@@ -38,7 +38,7 @@
           Elige la opcion necesaria:
         </p>
         <div
-          v-show="isMainPage"
+          v-if="isMainPage"
           class="flex justify-center items-center flex-col space-y-5 sm:flex-row sm:space-x-10 sm:space-y-0 mt-20"
         >
           <router-link
