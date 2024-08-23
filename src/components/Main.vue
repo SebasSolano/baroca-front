@@ -62,8 +62,6 @@
       :style="{
         background: '#E9E9E9',
         textAlign: 'center',
-        position: 'absolute',
-        bottom: '0',
         width: '100%',
       }"
     >

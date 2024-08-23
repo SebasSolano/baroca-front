@@ -2,6 +2,7 @@
   import { ref, onMounted } from "vue";
   import { fetchCountryData } from "../../api/api.js";
   import { message } from "ant-design-vue";
+  import CameraRegistration from "./CameraRegistration.vue"
 
   const checked = ref(false);
   const countries = ref([]);
@@ -25,6 +26,9 @@
     },
     {
       title: "Detalles del viaje",
+    },
+    {
+      title: "Foto de validacion",
     },
   ];
   const transportOptions = ref([
@@ -171,7 +175,7 @@
               </div>
             </a-form-item>
           </div>
-          <div v-else>
+          <div v-else-if="current === 2">
             <a-form-item>
               <div class="flex flex-col space-y-3 w-full">
                 <label>Medio de transporte de origen:</label>
@@ -195,8 +199,11 @@
               <a-switch v-model:checked="checked" />
             </a-form-item>
           </div>
+          <div v-else>
+            <CameraRegistration />
+          </div>
 
-          <a-form-item class="w-full text-center">
+          <a-form-item class="w-full text-center mt-5">
             <a-button
               v-if="current < steps.length - 1"
               type="primary"
