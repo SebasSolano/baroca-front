@@ -1,14 +1,30 @@
 <script setup>
   import { useRoute } from "vue-router";
-  import { computed } from "vue";
+  import { computed, ref, onMounted } from "vue";
   import { isEmpty, capitalize } from "lodash";
+  import QRCode from "qrcode";
 
+  const modal2Visible = ref(false);
+  const qrCodeDataUrl = ref("");
   const route = useRoute();
   const isMainPage = computed(() => route.path === "/");
 
   const titlePage = computed(() => {
     const path = route.path.replace(/\/:id$/, "");
     return isEmpty(path) || path === "/" ? "Home" : capitalize(path.slice(1));
+  });
+  const setModal1Visible = (open) => {
+    modal1Visible.value = open;
+  };
+
+  onMounted(async () => {
+    try {
+      qrCodeDataUrl.value = await QRCode.toDataURL(
+        "https://docs.google.com/forms/d/e/1FAIpQLSfSsAylMRAGP37hbfUJSM2UtsMTygZqqqzcT9up4pH8a4IXMg/viewform?pli=1"
+      );
+    } catch (error) {
+      console.error(error);
+    }
   });
 </script>
 <template>
@@ -19,8 +35,7 @@
       >
         <router-link to="/">
           <img class="w-14 rounded" src="../assets/images/baroca.png" />
-          </router-link
-        >
+        </router-link>
         <h1 class="text-white text-xl">{{ titlePage }}</h1>
       </div>
     </a-layout-header>
@@ -29,7 +44,7 @@
         class="rounded-xl"
         :style="{ background: '#fff', padding: '24px', minHeight: '500px' }"
       >
-      <router-view v-show="!isMainPage" v-slot="{ Component }">
+        <router-view v-show="!isMainPage" v-slot="{ Component }">
           <transition name="grow-in" mode="out-in">
             <Component :is="Component" />
           </transition>
@@ -37,25 +52,52 @@
         <p v-if="isMainPage" class="w-full text-2xl text-zinc-500">
           Elige la opcion necesaria:
         </p>
-        <div
-          v-if="isMainPage"
-          class="flex justify-center items-center flex-col space-y-5 sm:flex-row sm:space-x-10 sm:space-y-0 mt-20"
-        >
-          <router-link
-            to="/pre-registration"
-            class="mechanical-btn flex items-center hover:text-black justify-center bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+        <div v-if="isMainPage">
+          <div
+            class="flex justify-center items-center flex-col space-y-5 sm:flex-row sm:space-x-10 sm:space-y-0 mt-20"
           >
-            Pre-Registro
-          </router-link>
-          <router-link
-            to="/reserve"
-            class="mechanical-btn flex items-center justify-center hover:text-black bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+            <router-link
+              to="/pre-registration"
+              class="mechanical-btn flex items-center hover:text-black justify-center bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+            >
+              Pre-Registro
+            </router-link>
+            <router-link
+              to="/reserve"
+              class="mechanical-btn flex items-center justify-center hover:text-black bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+            >
+              Reserva
+            </router-link>
+          </div>
+          <div
+            class="flex justify-center items-center flex-col space-y-5 sm:flex-row sm:space-x-10 sm:space-y-0 mt-5"
           >
-            Reserva
-          </router-link>
+            <button
+              class="mechanical-btn flex items-center hover:text-black justify-center bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+              @click="modal2Visible = true"
+            >
+              Check-out
+            </button>
+            <a-modal
+              v-model:open="modal2Visible"
+              title="Escanea el codigo QR para poder entrar al Check-out"
+              centered
+              @ok="modal2Visible = false"
+            >
+            <div class="flex items-center justify-center">
+                <img :src="qrCodeDataUrl" alt="QR Code" />
+            </div>
+
+            </a-modal>
+
+            <router-link
+              to="/shop"
+              class="mechanical-btn flex items-center justify-center hover:text-black bg-white text-black border-2 border-black font-light py-4 px-8 rounded text-3xl w-9/12 lg:w-3/12 h-[200px]"
+            >
+              Shop
+            </router-link>
+          </div>
         </div>
-
-
       </div>
     </a-layout-content>
     <a-layout-footer

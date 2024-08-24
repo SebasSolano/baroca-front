@@ -12,80 +12,78 @@
   const countryOptions = ref([]);
   const current = ref(0);
   const transport = ref("Avion");
-  const form = reactive([
-    {
-      name: "",
-      last_name: "",
-      date_of_birth: "",
-      identification_number: 0,
-      origin: "",
-      state: "",
-      city: "",
-      address: "",
-      phone: 0,
-      email: "",
-      transport_origin: "",
-      document_type: "",
-      reason_trip: "",
-      is_first_time: false,
-      status: false,
-      created_at: "",
-      updated_at: "",
-    },
-  ]);
+  const form = reactive({
+    name: "",
+    last_name: "",
+    date_of_birth: "",
+    identification_number: 0,
+    origin: "",
+    state: "",
+    city: "",
+    address: "",
+    phone: 0,
+    email: "",
+    transport_origin: "",
+    document_type: "",
+    reason_trip: "",
+    is_first_time: false,
+    photo_Base64: null,
+    status: false,
+    created_at: "",
+    updated_at: "",
+  });
   const next = () => {
+    console.log(current.value);
     switch (current.value) {
       case 0:
+        console.log("Entro case 0");
         if (
           form.name !== "" &&
           form.last_name !== "" &&
           form.email !== "" &&
           form.date_of_birth !== ""
         ) {
+          console.log("Entro al if");
           current.value++;
-          break;
         } else {
           message.error("Debes rellenar los campos necesarios");
         }
+        break;
       case 1:
         if (
-          form.origin !== "" &&
+          selectedCountry.value !== undefined &&
           form.state !== "" &&
           form.city !== "" &&
-          form.date_of_birth !== "" &&
           form.phone > 0
         ) {
           current.value++;
-          break;
         } else {
           message.error("Debes rellenar los campos necesarios");
         }
+        break;
       case 2:
-        if (form.transport_origin !== "" && form.reason_trip !== "") {
+        if (form.reason_trip !== "") {
           current.value++;
-          break;
         } else {
           message.error("Debes rellenar los campos necesarios");
         }
-      case 3:
-        if (
-          form.name !== "" &&
-          form.last_name !== "" &&
-          form.email !== "" &&
-          form.date_of_birth !== ""
-        ) {
-          current.value++;
-          break;
-        } else {
-          message.error("Debes rellenar los campos necesarios");
-        }
+        break;
       default:
         message.error("Error");
         break;
     }
   };
   const prev = () => {
+    if(current.value == 3) form.photo_Base64 = null
     current.value--;
+  };
+  const sendInfo = () => {
+    if (form.photo_Base64 !== null) {
+      console.log(form.photo_Base64);
+      message.success("Datos enviados correctamente!");
+    } else {
+      message.error("Por favor, tomate la foto!");
+    }
   };
   const steps = [
     {
@@ -178,7 +176,7 @@
     <a-steps :current="current" :items="items"></a-steps>
     <div class="steps-content">
       <div class="w-full flex flex-col items-center justify-center">
-        <p class="text-gray-500">Informacion adicional:</p>
+        <p class="text-gray-500">Rellena los formularios:</p>
         <a-form class="w-full" layout="horizontal" style="max-width: 600px">
           <div v-if="current === 0">
             <a-form-item>
@@ -186,7 +184,7 @@
                 <div class="flex flex-col w-full space-y-3">
                   <label>Nombre:</label>
                   <a-input
-                    v-model="form.name"
+                    v-model:value="form.name"
                     class="h-12"
                     size="large"
                     required
@@ -195,7 +193,7 @@
                 <div class="flex flex-col w-full space-y-3">
                   <label>Apellido:</label>
                   <a-input
-                    v-model="form.last_name"
+                    v-model:value="form.last_name"
                     class="h-12"
                     size="large"
                     required
@@ -207,7 +205,7 @@
               <div class="flex flex-col w-full space-y-3">
                 <label>Correo:</label>
                 <a-input
-                  v-model="form.email"
+                  v-model:value="form.email"
                   type="email"
                   class="h-12"
                   size="large"
@@ -219,7 +217,7 @@
               <div class="flex flex-col space-y-3 w-full">
                 <label>Fecha de nacimiento:</label>
                 <a-date-picker
-                  v-model="form.date_of_birth"
+                  v-model:value="form.date_of_birth"
                   class="h-12"
                   size="large"
                   required
@@ -246,11 +244,21 @@
                 </div>
                 <div class="flex flex-col space-y-3 w-full">
                   <label>Departamento/Estado:</label>
-                  <a-input class="h-12" size="large" required />
+                  <a-input
+                    v-model:value="form.state"
+                    class="h-12"
+                    size="large"
+                    required
+                  />
                 </div>
                 <div class="flex flex-col space-y-3 w-full">
                   <label>Cuidad:</label>
-                  <a-input class="h-12" size="large" required />
+                  <a-input
+                    v-model:value="form.city"
+                    class="h-12"
+                    size="large"
+                    required
+                  />
                 </div>
               </div>
             </a-form-item>
@@ -258,7 +266,13 @@
               <div class="flex flex-row items-center justify-center space-x-5">
                 <div class="flex flex-col w-full space-y-3">
                   <label>Direccion:</label>
-                  <a-input type="text" class="h-12" size="large" required />
+                  <a-input
+                    v-model:value="form.address"
+                    type="text"
+                    class="h-12"
+                    size="large"
+                    required
+                  />
                 </div>
               </div>
             </a-form-item>
@@ -270,7 +284,12 @@
                     <span class="bg-gray-200 p-1 rounded-sm">{{
                       phoneCode
                     }}</span>
-                    <a-input type="number" size="large" required />
+                    <a-input
+                      v-model:value="form.phone"
+                      type="number"
+                      size="large"
+                      required
+                    />
                   </div>
                 </div>
               </div>
@@ -293,7 +312,11 @@
             <a-form-item>
               <div class="flex flex-col space-y-3 w-full">
                 <label>Motivo de viaje:</label>
-                <a-textarea size="large" required />
+                <a-textarea
+                  v-model:value="form.reason_trip"
+                  size="large"
+                  required
+                />
               </div>
             </a-form-item>
 
@@ -302,11 +325,11 @@
             </a-form-item>
           </div>
           <div v-else>
-            <CameraRegistration />
+            <CameraRegistration @imageCaptured="form.photo_Base64 = $event" />
           </div>
 
           <a-form-item>
-            <div class="w-full flex items-center justify-center space-x-5 mt-5">
+            <div class="w-full flex items-center justify-center space-x-5" :class="form.photo_Base64 ? 'mt-10' : 'mt-5'">
               <a-button
                 v-if="current < steps.length - 1"
                 class="h-20 w-full text-2xl flex items-center justify-center"
@@ -318,7 +341,7 @@
                 v-if="current == steps.length - 1"
                 class="h-20 w-full text-2xl flex items-center justify-center"
                 type="primary"
-                @click="message.success('Processing complete!')"
+                @click="sendInfo"
               >
                 Enviar informacion
               </a-button>

@@ -1,11 +1,14 @@
 <script setup>
-  import { ref, onMounted } from "vue";
+  import { ref, onMounted, defineEmits } from "vue";
   import { CameraOutlined } from "@ant-design/icons-vue";
+
+  const emit = defineEmits();
 
   const videoRef = ref(null);
   const canvasRef = ref(null);
   const capturedImage = ref(null);
   const imageCaptured = ref(false);
+
 
   const startVideo = () => {
     navigator.mediaDevices
@@ -34,6 +37,15 @@
 
   const sendImage = () => {
     console.log("Enviando imagen a la base de datos...");
+    const base64Data = capturedImage.value.split(',')[1];
+    const binaryString = window.atob(base64Data);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    emit('imageCaptured', bytes);
+    imageCaptured.value = false
   };
 
   const retakeImage = () => {
@@ -55,7 +67,7 @@
       <a-button
         class="h-20 w-20 text-3xl mt-2"
         @click="captureImage"
-        v-if="!imageCaptured"
+        v-if="!imageCaptured && !capturedImage"
       >
         <CameraOutlined />
       </a-button>
