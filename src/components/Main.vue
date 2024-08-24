@@ -3,6 +3,7 @@
   import { computed, ref, onMounted } from "vue";
   import { isEmpty, capitalize } from "lodash";
   import QRCode from "qrcode";
+  import { ArrowLeftOutlined } from "@ant-design/icons-vue";
 
   const modal2Visible = ref(false);
   const qrCodeDataUrl = ref("");
@@ -13,9 +14,6 @@
     const path = route.path.replace(/\/:id$/, "");
     return isEmpty(path) || path === "/" ? "Home" : capitalize(path.slice(1));
   });
-  const setModal1Visible = (open) => {
-    modal1Visible.value = open;
-  };
 
   onMounted(async () => {
     try {
@@ -33,6 +31,9 @@
       <div
         class="h-20 flex items-center justify-center sm:justify-start space-x-3"
       >
+        <router-link v-if="route.path !== '/'" to="/" class="text-white text-3xl p-2 transition-all m-2 hover:text-white hover:scale-125">
+          <ArrowLeftOutlined />
+        </router-link>
         <router-link to="/">
           <img class="w-14 rounded" src="../assets/images/baroca.png" />
         </router-link>
@@ -84,10 +85,9 @@
               centered
               @ok="modal2Visible = false"
             >
-            <div class="flex items-center justify-center">
+              <div class="flex items-center justify-center">
                 <img :src="qrCodeDataUrl" alt="QR Code" />
-            </div>
-
+              </div>
             </a-modal>
 
             <router-link
