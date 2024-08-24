@@ -1,8 +1,9 @@
 <script setup>
-  import { ref, onMounted } from "vue";
+  import { ref, reactive, onMounted } from "vue";
   import { fetchCountryData } from "../../api/api.js";
   import { message } from "ant-design-vue";
-  import CameraRegistration from "./CameraRegistration.vue"
+  import CameraRegistration from "./CameraRegistration.vue";
+  import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons-vue";
 
   const checked = ref(false);
   const countries = ref([]);
@@ -11,8 +12,77 @@
   const countryOptions = ref([]);
   const current = ref(0);
   const transport = ref("Avion");
+  const form = reactive([
+    {
+      name: "",
+      last_name: "",
+      date_of_birth: "",
+      identification_number: 0,
+      origin: "",
+      state: "",
+      city: "",
+      address: "",
+      phone: 0,
+      email: "",
+      transport_origin: "",
+      document_type: "",
+      reason_trip: "",
+      is_first_time: false,
+      status: false,
+      created_at: "",
+      updated_at: "",
+    },
+  ]);
   const next = () => {
-    current.value++;
+    switch (current.value) {
+      case 0:
+        if (
+          form.name !== "" &&
+          form.last_name !== "" &&
+          form.email !== "" &&
+          form.date_of_birth !== ""
+        ) {
+          current.value++;
+          break;
+        } else {
+          message.error("Debes rellenar los campos necesarios");
+        }
+      case 1:
+        if (
+          form.origin !== "" &&
+          form.state !== "" &&
+          form.city !== "" &&
+          form.date_of_birth !== "" &&
+          form.phone > 0
+        ) {
+          current.value++;
+          break;
+        } else {
+          message.error("Debes rellenar los campos necesarios");
+        }
+      case 2:
+        if (form.transport_origin !== "" && form.reason_trip !== "") {
+          current.value++;
+          break;
+        } else {
+          message.error("Debes rellenar los campos necesarios");
+        }
+      case 3:
+        if (
+          form.name !== "" &&
+          form.last_name !== "" &&
+          form.email !== "" &&
+          form.date_of_birth !== ""
+        ) {
+          current.value++;
+          break;
+        } else {
+          message.error("Debes rellenar los campos necesarios");
+        }
+      default:
+        message.error("Error");
+        break;
+    }
   };
   const prev = () => {
     current.value--;
@@ -115,24 +185,45 @@
               <div class="flex flex-row justify-center space-x-5">
                 <div class="flex flex-col w-full space-y-3">
                   <label>Nombre:</label>
-                  <a-input size="large" />
+                  <a-input
+                    v-model="form.name"
+                    class="h-12"
+                    size="large"
+                    required
+                  />
                 </div>
                 <div class="flex flex-col w-full space-y-3">
                   <label>Apellido:</label>
-                  <a-input size="large" />
+                  <a-input
+                    v-model="form.last_name"
+                    class="h-12"
+                    size="large"
+                    required
+                  />
                 </div>
               </div>
             </a-form-item>
             <a-form-item>
               <div class="flex flex-col w-full space-y-3">
                 <label>Correo:</label>
-                <a-input size="large" />
+                <a-input
+                  v-model="form.email"
+                  type="email"
+                  class="h-12"
+                  size="large"
+                  required
+                />
               </div>
             </a-form-item>
             <a-form-item>
               <div class="flex flex-col space-y-3 w-full">
                 <label>Fecha de nacimiento:</label>
-                <a-date-picker size="large" />
+                <a-date-picker
+                  v-model="form.date_of_birth"
+                  class="h-12"
+                  size="large"
+                  required
+                />
               </div>
             </a-form-item>
           </div>
@@ -149,15 +240,25 @@
                     :options="countryOptions"
                     :filter-option="filterOption"
                     @change="getCountryDetails"
+                    size="large"
+                    required
                   ></a-select>
                 </div>
                 <div class="flex flex-col space-y-3 w-full">
                   <label>Departamento/Estado:</label>
-                  <a-input size="large" />
+                  <a-input class="h-12" size="large" required />
                 </div>
                 <div class="flex flex-col space-y-3 w-full">
                   <label>Cuidad:</label>
-                  <a-input size="large" />
+                  <a-input class="h-12" size="large" required />
+                </div>
+              </div>
+            </a-form-item>
+            <a-form-item>
+              <div class="flex flex-row items-center justify-center space-x-5">
+                <div class="flex flex-col w-full space-y-3">
+                  <label>Direccion:</label>
+                  <a-input type="text" class="h-12" size="large" required />
                 </div>
               </div>
             </a-form-item>
@@ -169,7 +270,7 @@
                     <span class="bg-gray-200 p-1 rounded-sm">{{
                       phoneCode
                     }}</span>
-                    <a-input type="number" size="large" />
+                    <a-input type="number" size="large" required />
                   </div>
                 </div>
               </div>
@@ -184,6 +285,7 @@
                   v-model:value="transport"
                   size="large"
                   :options="transportOptions"
+                  required
                 ></a-select>
               </div>
             </a-form-item>
@@ -191,35 +293,42 @@
             <a-form-item>
               <div class="flex flex-col space-y-3 w-full">
                 <label>Motivo de viaje:</label>
-                <a-textarea size="large" />
+                <a-textarea size="large" required />
               </div>
             </a-form-item>
 
             <a-form-item label="Primera vez?">
-              <a-switch v-model:checked="checked" />
+              <a-switch v-model:checked="checked" required />
             </a-form-item>
           </div>
           <div v-else>
             <CameraRegistration />
           </div>
 
-          <a-form-item class="w-full text-center mt-5">
-            <a-button
-              v-if="current < steps.length - 1"
-              type="primary"
-              @click="next"
-              >Siguiente</a-button
-            >
-            <a-button
-              v-if="current == steps.length - 1"
-              type="primary"
-              @click="message.success('Processing complete!')"
-            >
-              Enviar informacion
-            </a-button>
-            <a-button v-if="current > 0" style="margin-left: 8px" @click="prev"
-              >Atras</a-button
-            >
+          <a-form-item>
+            <div class="w-full flex items-center justify-center space-x-5 mt-5">
+              <a-button
+                v-if="current < steps.length - 1"
+                class="h-20 w-full text-2xl flex items-center justify-center"
+                type="primary"
+                @click="next"
+                ><ArrowRightOutlined
+              /></a-button>
+              <a-button
+                v-if="current == steps.length - 1"
+                class="h-20 w-full text-2xl flex items-center justify-center"
+                type="primary"
+                @click="message.success('Processing complete!')"
+              >
+                Enviar informacion
+              </a-button>
+              <a-button
+                v-if="current > 0"
+                class="h-20 w-full text-2xl flex items-center justify-center"
+                @click="prev"
+                ><ArrowLeftOutlined
+              /></a-button>
+            </div>
           </a-form-item>
         </a-form>
       </div>

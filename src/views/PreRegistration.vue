@@ -3,7 +3,7 @@
   import { reactive, ref } from "vue";
   import { fetchHuespedData } from "../api/api";
   import _ from "lodash";
-  import FromRegistration from '../components/pre-registration/FormRegistration.vue'
+  import FromRegistration from "../components/pre-registration/FormRegistration.vue";
 
   const formState = reactive({ dni: "" });
   const value1 = ref("Cédula de ciudadanía");
@@ -42,6 +42,8 @@
     } catch (error) {
       console.log(error);
     } finally {
+        // cambiar cuando funcione el fetch
+      status.value = true;
       loading.value = false;
     }
   };
@@ -77,7 +79,7 @@
             :placeholder="`Ingresa tu ${_.startCase(
               value1.replace(/_/g, ' ')
             )}`"
-            >
+          >
             <template #prefix>
               <NumberOutlined style="color: rgba(0, 0, 0, 0.25)" />
             </template>
