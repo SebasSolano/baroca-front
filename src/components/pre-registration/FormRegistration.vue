@@ -1,6 +1,10 @@
 <script setup>
   import { ref, reactive, onMounted } from "vue";
-  import { fetchCountryData, fetchAddData } from "../../api/api.js";
+  import {
+    fetchCountryData,
+    fetchAddData,
+    fetchEditData,
+  } from "../../api/api.js";
   import { message } from "ant-design-vue";
   import CameraRegistration from "./CameraRegistration.vue";
   import dayjs from "dayjs";
@@ -101,8 +105,6 @@
         form.status = true;
         form.origin = selectedCountry.value;
         form.date_of_birth = dayjs(form.date_of_birth).format("YYYY-MM-DD");
-        form.created_at = dayjs().format("YYYY-MM-DD");
-        form.updated_at = dayjs().format("YYYY-MM-DD");
         form.transport_origin = transport.value;
         form.is_first_time = checked.value;
 
@@ -111,8 +113,16 @@
         }
 
         if (props.dataExists) {
+          const uuidURL = props.data.uuid;
+          form.updated_at = dayjs().format("YYYY-MM-DD");
+          await fetchEditData(uuidURL, form);
           message.success("Datos actualizados correctamente!");
+          setTimeout(() => {
+            loading.value = false;
+          }, 1000);
         } else {
+          form.created_at = dayjs().format("YYYY-MM-DD");
+          form.updated_at = dayjs().format("YYYY-MM-DD");
           const uuidURL = await fetchAddData(form);
           message.success("Datos enviados correctamente!");
           setTimeout(() => {
