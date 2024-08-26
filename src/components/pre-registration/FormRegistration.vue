@@ -107,7 +107,7 @@
         form.date_of_birth = dayjs(form.date_of_birth).format("YYYY-MM-DD");
         form.transport_origin = transport.value;
         form.is_first_time = checked.value;
-
+        form.updated_at = dayjs().format("YYYY-MM-DD");
         for (const key in form) {
           console.log(`${key}: ${form[key]}`);
         }
@@ -122,7 +122,6 @@
           }, 1000);
         } else {
           form.created_at = dayjs().format("YYYY-MM-DD");
-          form.updated_at = dayjs().format("YYYY-MM-DD");
           const uuidURL = await fetchAddData(form);
           message.success("Datos enviados correctamente!");
           setTimeout(() => {
