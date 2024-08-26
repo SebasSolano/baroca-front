@@ -130,7 +130,7 @@
           message.success("Datos enviados correctamente!");
           setTimeout(() => {
             loading.value = false;
-            router.push(`/success/${uuidURL}`);
+            router.push(`/success`);
           }, 1000);
         }
       } catch (error) {
