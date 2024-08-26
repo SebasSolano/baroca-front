@@ -35,7 +35,7 @@
     loading.value = true;
     try {
       dataInfo.value = await fetchHuespedData(formState.dni);
-      if (dataInfo.value && dataInfo.value.statusCode !== 500) {
+      if (dataInfo.value.body.data !== null) {
         dataExists.value = true;
       }else{
         dataInfo.value = null;

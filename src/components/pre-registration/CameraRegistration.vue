@@ -9,7 +9,7 @@
   const canvasRef = ref(null);
   const capturedImage = ref(null);
   const imageCaptured = ref(false);
-  const successSend = ref(false)
+  const successSend = ref(false);
 
   const startVideo = () => {
     navigator.mediaDevices
@@ -25,15 +25,18 @@
     context.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
     context.strokeStyle = "red";
     context.lineWidth = 4;
-    context.strokeRect(100, 50, 300, 300);
+    context.strokeRect(150, 50, 300, 300);
   };
 
   const captureImage = () => {
     const context = canvasRef.value.getContext("2d");
-    context.drawImage(videoRef.value, 0, 0, 600, 400);
+    // Calcular las coordenadas para centrar la imagen
+    const x = (canvasRef.value.width - videoRef.value.videoWidth) / 2;
+    const y = (canvasRef.value.height - videoRef.value.videoHeight) / 2;
+    context.drawImage(videoRef.value, 0, 0, videoRef.value.videoWidth, 500);
     capturedImage.value = canvasRef.value.toDataURL("image/png");
     imageCaptured.value = true;
-  };
+};
   const sendImage = async () => {
     imageCaptured.value = true;
     // Comprimir la imagen
@@ -63,7 +66,7 @@
       console.log("Blob type:", blob.type);
 
       emit("imageCaptured", blob);
-      successSend.value = true
+      successSend.value = true;
     };
     reader.readAsArrayBuffer(compressedFile); // Leer el archivo como un ArrayBuffer
   };
@@ -79,9 +82,12 @@
 </script>
 
 <template>
-  <div class="relative flex-col items-center">
-    <video ref="videoRef" width="500" height="500" autoplay></video>
-    <canvas ref="canvasRef" width="500" height="500" class="overlay"></canvas>
+  <div class="relative flex-col items-center justify-center">
+    <div class="flex items-center justify-center">
+      <video v-show="!imageCaptured" ref="videoRef" width="500" height="500" autoplay></video>
+      <canvas ref="canvasRef" width="500" height="500" class="pointer-events-none flex items-center justify-center " :class="{'absolute top-0 left-0': !imageCaptured}"></canvas>
+    </div>
+
     <div class="flex items-center justify-center">
       <a-button
         class="h-20 w-20 text-3xl mt-2"
@@ -107,12 +113,5 @@
     position: relative;
     display: flex;
     justify-content: center;
-  }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    pointer-events: none;
   }
 </style>
