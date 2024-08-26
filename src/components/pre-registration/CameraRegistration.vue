@@ -9,6 +9,7 @@
   const canvasRef = ref(null);
   const capturedImage = ref(null);
   const imageCaptured = ref(false);
+  const successSend = ref(false)
 
   const startVideo = () => {
     navigator.mediaDevices
@@ -34,6 +35,7 @@
     imageCaptured.value = true;
   };
   const sendImage = async () => {
+    imageCaptured.value = true;
     // Comprimir la imagen
     const compressedFile = await imageCompression.getFilefromDataUrl(
       capturedImage.value,
@@ -61,7 +63,7 @@
       console.log("Blob type:", blob.type);
 
       emit("imageCaptured", blob);
-      imageCaptured.value = false;
+      successSend.value = true
     };
     reader.readAsArrayBuffer(compressedFile); // Leer el archivo como un ArrayBuffer
   };
@@ -84,14 +86,14 @@
       <a-button
         class="h-20 w-20 text-3xl mt-2"
         @click="captureImage"
-        v-if="!imageCaptured && !capturedImage"
+        v-if="!imageCaptured"
       >
         <CameraOutlined />
       </a-button>
     </div>
     <div
       class="flex items-center justify-center space-x-3 mt-10"
-      v-if="imageCaptured"
+      v-if="imageCaptured && !successSend"
     >
       <a-button class="h-20 w-32" @click="sendImage">Enviar Foto</a-button>
       <a-button class="h-20 w-32" @click="retakeImage"
