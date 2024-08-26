@@ -33,6 +33,16 @@ export const fetchEditData = async (uuid, data) => {
   }
 };
 
+export const fetchHuespedUuid = async (uuid) => {
+    const url = `${API}key/uuid/${uuid}`;
+    try {
+      const response = await axios.get(url);
+      return response.data.body.data;
+    } catch (error) {
+      console.error(error.response.data);
+    }
+  };
+
 export const fetchCountryData = async () => {
   try {
     const response = await axios.get("https://restcountries.com/v3.1/all");

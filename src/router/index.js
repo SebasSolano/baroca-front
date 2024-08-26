@@ -15,7 +15,7 @@ const routes = [
         component: () => import("../views/Success.vue"),
       },
       {
-        path: "/success:uuid",
+        path: "/success/:uuid",
         component: () => import("../views/Success.vue"),
       },
       {

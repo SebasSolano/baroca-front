@@ -127,9 +127,12 @@
         } else {
           form.created_at = dayjs().format("YYYY-MM-DD");
           const uuidURL = await fetchAddData(form);
+          console.log(uuidURL);
           message.success("Datos enviados correctamente!");
           setTimeout(() => {
             loading.value = false;
+            const currentLink = window.location.href;
+            localStorage.setItem("link", `${currentLink}/success/${uuidURL.uuid}`)
             router.push(`/success`);
           }, 1000);
         }
