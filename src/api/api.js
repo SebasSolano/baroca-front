@@ -17,7 +17,7 @@ export const fetchAddData = async (formData) => {
   const url = `${API}key/`;
   try {
     const response = await axios.post(url, formData);
-    return response.data;
+    return response.data.body.data;
   } catch (error) {
     console.error("Error during post request:", error.response.data);
   }
@@ -32,6 +32,16 @@ export const fetchEditData = async (uuid, data) => {
     console.error("Error during post request:", error.response.data);
   }
 };
+
+export const fetchHuespedUuid = async (uuid) => {
+    const url = `${API}key/uuid/${uuid}`;
+    try {
+      const response = await axios.get(url);
+      return response.data.body.data;
+    } catch (error) {
+      console.error(error.response.data);
+    }
+  };
 
 export const fetchCountryData = async () => {
   try {

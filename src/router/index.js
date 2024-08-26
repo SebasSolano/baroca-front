@@ -11,7 +11,11 @@ const routes = [
         component: () => import("../views/PreRegistration.vue"),
       },
       {
-        path: "/success:id",
+        path: "/success",
+        component: () => import("../views/Success.vue"),
+      },
+      {
+        path: "/success/:uuid",
         component: () => import("../views/Success.vue"),
       },
       {

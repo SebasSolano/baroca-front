@@ -9,6 +9,7 @@
   import CameraRegistration from "./CameraRegistration.vue";
   import dayjs from "dayjs";
   import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons-vue";
+  import { useRouter } from "vue-router";
 
   const props = defineProps({
     data: {
@@ -28,6 +29,8 @@
       required: false,
     },
   });
+
+  const router = useRouter();
   const checked = ref(false);
   const countries = ref([]);
   const selectedCountry = ref(undefined);
@@ -119,13 +122,18 @@
           message.success("Datos actualizados correctamente!");
           setTimeout(() => {
             loading.value = false;
+            router.push(`/success/${uuidURL}`);
           }, 1000);
         } else {
           form.created_at = dayjs().format("YYYY-MM-DD");
           const uuidURL = await fetchAddData(form);
+          console.log(uuidURL);
           message.success("Datos enviados correctamente!");
           setTimeout(() => {
             loading.value = false;
+            const currentLink = window.location.href;
+            localStorage.setItem("link", `${currentLink}/success/${uuidURL.uuid}`)
+            router.push(`/success`);
           }, 1000);
         }
       } catch (error) {

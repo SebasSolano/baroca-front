@@ -11,11 +11,16 @@
   const isMainPage = computed(() => route.path === "/");
 
   const titlePage = computed(() => {
-    const path = route.path.replace(/\/:id$/, "");
+    if (route.path.startsWith("/success")) {
+      return "Success"; // Título específico para la ruta de éxito
+    }
+    const path = route.path
+      .replace(/\/:uuid$/, "")
+      .replace(/\/success\/.*/, ""); // Captura solo la parte relevante
     return isEmpty(path) || path === "/" ? "Home" : capitalize(path.slice(1));
   });
-
   onMounted(async () => {
+    console.log(route.path);
     try {
       qrCodeDataUrl.value = await QRCode.toDataURL(
         "https://docs.google.com/forms/d/e/1FAIpQLSfSsAylMRAGP37hbfUJSM2UtsMTygZqqqzcT9up4pH8a4IXMg/viewform?pli=1"
@@ -31,12 +36,16 @@
       <div
         class="h-20 flex items-center justify-center sm:justify-start space-x-3"
       >
-        <router-link v-if="route.path !== '/'" to="/" class="text-white text-3xl p-2 transition-all m-2 hover:text-white hover:scale-125">
+        <router-link
+          v-if="route.path !== '/'"
+          to="/"
+          class="text-white text-3xl p-2 transition-all m-2 hover:text-white hover:scale-125"
+        >
           <ArrowLeftOutlined />
         </router-link>
-        <router-link to="/">
-          <img class="w-14 rounded" src="../assets/images/baroca.png" />
-        </router-link>
+
+        <img class="w-14 rounded" src="../assets/images/baroca.png" />
+
         <h1 class="text-white text-xl">{{ titlePage }}</h1>
       </div>
     </a-layout-header>
