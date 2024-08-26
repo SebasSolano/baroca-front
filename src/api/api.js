@@ -1,17 +1,25 @@
+import { Form } from "ant-design-vue";
 import axios from "axios";
-const KEY = "8c7ef5bbb8b96738ed64e06b9b9042fd5d000be9"
-const API = "https://baroca.vercel.app/api/huesped";
-
+const KEY = "8c7ef5bbb8b96738ed64e06b9b9042fd5d000be9";
+const API = "https://baroca.vercel.app/api/huesped/";
 
 export const fetchHuespedData = async (data) => {
+  const url = `${API}key/id/${data}`;
   try {
-    const response = await axios.get(API, {
-      params: { key: KEY, data },
-    });
-    return response.data;
+    const response = await axios.get(url);
+    if (response.data) return response.data;
   } catch (error) {
-    console.error("Error fetching huesped data:", error);
-    throw error;
+    console.error(error.response.data);
+  }
+};
+
+export const fetchAddData = async (formData) => {
+  const url = `${API}key/`;
+  try {
+    const response = await axios.post(url, formData);
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error during post request:", error.response.data);
   }
 };
 

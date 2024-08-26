@@ -10,6 +10,7 @@
   const dataInfo = ref([]);
   const loading = ref(false);
   const status = ref(false);
+  const dataExists = ref(false);
   const options1 = ref([
     { value: "cedula_ciudadania", label: "Cédula de ciudadanía" },
     { value: "licencia_conducir", label: "Licencia de conducir" },
@@ -30,19 +31,21 @@
     },
   ]);
 
-  const focus = () => console.log("focus");
-  const handleChange = (value) => console.log(`selected ${value}`);
-
-  const handleFinish = async (values) => {
+  const handleFinish = async () => {
     loading.value = true;
     try {
-      dataInfo.value = await fetchHuespedData(values);
-      console.log(dataInfo.value);
-      status.value = true;
+      dataInfo.value = await fetchHuespedData(formState.dni);
+      if (dataInfo.value && dataInfo.value.statusCode !== 500) {
+        dataExists.value = true;
+      }else{
+        dataInfo.value = null;
+      }
+      if (value1.value === "Cédula de ciudadanía")
+        value1.value = "cedula_ciudadania";
     } catch (error) {
       console.log(error);
+      dataExists.value = false;
     } finally {
-        // cambiar cuando funcione el fetch
       status.value = true;
       loading.value = false;
     }
@@ -67,8 +70,6 @@
             :disabled="loading || status"
             style="width: 300px"
             :options="options1"
-            @focus="focus"
-            @change="handleChange"
           />
         </a-form-item>
         <a-form-item>
@@ -100,6 +101,12 @@
         </a-form-item>
       </a-form>
     </div>
-    <FromRegistration v-show="status" />
+    <FromRegistration
+      :data="dataInfo ? dataInfo.body.data : null"
+      :dni="formState.dni"
+      :document_type="value1"
+      :dataExists="dataExists"
+      v-if="status"
+    />
   </div>
 </template>

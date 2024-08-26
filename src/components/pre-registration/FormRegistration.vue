@@ -1,10 +1,29 @@
 <script setup>
   import { ref, reactive, onMounted } from "vue";
-  import { fetchCountryData } from "../../api/api.js";
+  import { fetchCountryData, fetchAddData } from "../../api/api.js";
   import { message } from "ant-design-vue";
   import CameraRegistration from "./CameraRegistration.vue";
+  import dayjs from "dayjs";
   import { ArrowRightOutlined, ArrowLeftOutlined } from "@ant-design/icons-vue";
 
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: false,
+    },
+    dni: {
+      type: String,
+      required: false,
+    },
+    document_type: {
+      type: String,
+      required: false,
+    },
+    dataExists: {
+      type: Boolean,
+      required: false,
+    },
+  });
   const checked = ref(false);
   const countries = ref([]);
   const selectedCountry = ref(undefined);
@@ -27,23 +46,20 @@
     document_type: "",
     reason_trip: "",
     is_first_time: false,
-    photo_Base64: null,
+    photo_base64: null,
     status: false,
     created_at: "",
     updated_at: "",
   });
   const next = () => {
-    console.log(current.value);
     switch (current.value) {
       case 0:
-        console.log("Entro case 0");
         if (
           form.name !== "" &&
           form.last_name !== "" &&
           form.email !== "" &&
           form.date_of_birth !== ""
         ) {
-          console.log("Entro al if");
           current.value++;
         } else {
           message.error("Debes rellenar los campos necesarios");
@@ -74,13 +90,34 @@
     }
   };
   const prev = () => {
-    if(current.value == 3) form.photo_Base64 = null
+    if (current.value == 3) form.photo_base64 = null;
     current.value--;
   };
-  const sendInfo = () => {
-    if (form.photo_Base64 !== null) {
-      console.log(form.photo_Base64);
-      message.success("Datos enviados correctamente!");
+  const sendInfo = async () => {
+    if (form.photo_base64 !== null) {
+      try {
+        form.status = true;
+        form.origin = selectedCountry.value;
+        form.date_of_birth = dayjs(form.date_of_birth).format("YYYY-MM-DD");
+        form.created_at = dayjs().format("YYYY-MM-DD");
+        form.updated_at = dayjs().format("YYYY-MM-DD");
+        form.transport_origin = transport.value;
+        form.is_first_time = checked.value
+        //form.photo_base64 = null
+
+        for (const key in form) {
+            console.log(`${key}: ${form[key]}`)
+        }
+
+        if (props.dataExists) {
+          message.success("Datos actualizados correctamente!");
+        } else {
+          await fetchAddData(form);
+          message.success("Datos enviados correctamente!");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     } else {
       message.error("Por favor, tomate la foto!");
     }
@@ -154,20 +191,42 @@
   const loadCountries = async () => {
     try {
       countries.value = await fetchCountryData();
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-    }
-  };
-
-  onMounted(() => {
-    loadCountries().then(() => {
       countryOptions.value = countries.value
         .map((country) => ({
           value: country.name.common,
           label: country.name.common,
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
-    });
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
+  onMounted(async () => {
+    try {
+      await loadCountries();
+      console.log(props.dataExists);
+      if (props.dataExists && props.data) {
+        if (props.data.date_of_birth) {
+          const date = dayjs(props.data.date_of_birth, "YYYY-MM-DD");
+          props.data.date_of_birth = date;
+          console.log(form.date_of_birth);
+        }
+        selectedCountry.value =
+          props.data.origin.charAt(0).toUpperCase() +
+          props.data.origin.slice(1);
+        checked.value = props.data.is_first_time;
+        if (selectedCountry.value && props.data.phone) getCountryDetails();
+        Object.assign(form, props.data);
+        console.log(form);
+      }
+    } catch (error) {
+      console.log("error:", error);
+    }
+
+    form.document_type = props.document_type;
+    form.identification_number = props.dni;
+    console.log(form.document_type, form.identification_number);
   });
 </script>
 
@@ -325,11 +384,14 @@
             </a-form-item>
           </div>
           <div v-else>
-            <CameraRegistration @imageCaptured="form.photo_Base64 = $event" />
+            <CameraRegistration @imageCaptured="form.photo_base64 = $event" />
           </div>
 
           <a-form-item>
-            <div class="w-full flex items-center justify-center space-x-5" :class="form.photo_Base64 ? 'mt-10' : 'mt-5'">
+            <div
+              class="w-full flex items-center justify-center space-x-5"
+              :class="form.photo_base64 ? 'mt-10' : 'mt-5'"
+            >
               <a-button
                 v-if="current < steps.length - 1"
                 class="h-20 w-full text-2xl flex items-center justify-center"
