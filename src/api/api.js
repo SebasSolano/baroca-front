@@ -17,7 +17,7 @@ export const fetchAddData = async (formData) => {
   const url = `${API}key/`;
   try {
     const response = await axios.post(url, formData);
-    return response.data;
+    return response.data.body.data;
   } catch (error) {
     console.error("Error during post request:", error.response.data);
   }
