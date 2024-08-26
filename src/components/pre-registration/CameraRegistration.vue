@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted, defineEmits } from "vue";
   import { CameraOutlined } from "@ant-design/icons-vue";
+  import imageCompression from "browser-image-compression";
 
   const emit = defineEmits();
 
@@ -8,7 +9,6 @@
   const canvasRef = ref(null);
   const capturedImage = ref(null);
   const imageCaptured = ref(false);
-
 
   const startVideo = () => {
     navigator.mediaDevices
@@ -32,22 +32,39 @@
     context.drawImage(videoRef.value, 0, 0, 600, 400);
     capturedImage.value = canvasRef.value.toDataURL("image/png");
     imageCaptured.value = true;
-    console.log("Imagen capturada:", capturedImage.value);
   };
+  const sendImage = async () => {
+    // Comprimir la imagen
+    const compressedFile = await imageCompression.getFilefromDataUrl(
+      capturedImage.value,
+      {
+        maxSizeMB: 0.7,
+        maxWidthOrHeight: 300,
+        useWebWorker: true,
+        initialQuality: 0.3,
+      }
+    );
 
-  const sendImage = () => {
-    console.log("Enviando imagen a la base de datos...");
-    const base64Data = capturedImage.value.split(',')[1];
-    const binaryString = window.atob(base64Data);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    emit('imageCaptured', bytes);
-    imageCaptured.value = false
+    /*
+    console.log("Tamaño de la imagen comprimida:", compressedFile.size);
+    emit("imageCaptured", compressedFile);
+    imageCaptured.value = false;
+    */
+    // Cambiar la forma en que se manejan los datos de la imagen
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const bytes = new Uint8Array(reader.result);
+      console.log("Tamaño de la imagen comprimida:", compressedFile.size);
+      const blob = new Blob([bytes]);
+      console.log("Blob details:", blob);
+      console.log("Blob size:", blob.size);
+      console.log("Blob type:", blob.type);
+
+      emit("imageCaptured", blob);
+      imageCaptured.value = false;
+    };
+    reader.readAsArrayBuffer(compressedFile); // Leer el archivo como un ArrayBuffer
   };
-
   const retakeImage = () => {
     imageCaptured.value = false;
     drawRectangle();
