@@ -7,7 +7,7 @@ export const fetchHuespedData = async (data) => {
   const url = `${API}key/id/${data}`;
   try {
     const response = await axios.get(url);
-    if (response.data) return response.data;
+    return response.data;
   } catch (error) {
     console.error(error.response.data);
   }
