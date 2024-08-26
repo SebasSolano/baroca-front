@@ -1,6 +1,10 @@
 <script setup>
   import { ref, reactive, onMounted } from "vue";
-  import { fetchCountryData, fetchAddData } from "../../api/api.js";
+  import {
+    fetchCountryData,
+    fetchAddData,
+    fetchEditData,
+  } from "../../api/api.js";
   import { message } from "ant-design-vue";
   import CameraRegistration from "./CameraRegistration.vue";
   import dayjs from "dayjs";
@@ -31,6 +35,7 @@
   const countryOptions = ref([]);
   const current = ref(0);
   const transport = ref("Avion");
+  const loading = ref(false);
   const form = reactive({
     name: "",
     last_name: "",
@@ -95,25 +100,34 @@
   };
   const sendInfo = async () => {
     if (form.photo_base64 !== null) {
+      loading.value = true;
       try {
         form.status = true;
         form.origin = selectedCountry.value;
         form.date_of_birth = dayjs(form.date_of_birth).format("YYYY-MM-DD");
-        form.created_at = dayjs().format("YYYY-MM-DD");
-        form.updated_at = dayjs().format("YYYY-MM-DD");
         form.transport_origin = transport.value;
-        form.is_first_time = checked.value
-        //form.photo_base64 = null
+        form.is_first_time = checked.value;
 
         for (const key in form) {
-            console.log(`${key}: ${form[key]}`)
+          console.log(`${key}: ${form[key]}`);
         }
 
         if (props.dataExists) {
+          const uuidURL = props.data.uuid;
+          form.updated_at = dayjs().format("YYYY-MM-DD");
+          await fetchEditData(uuidURL, form);
           message.success("Datos actualizados correctamente!");
+          setTimeout(() => {
+            loading.value = false;
+          }, 1000);
         } else {
-          await fetchAddData(form);
+          form.created_at = dayjs().format("YYYY-MM-DD");
+          form.updated_at = dayjs().format("YYYY-MM-DD");
+          const uuidURL = await fetchAddData(form);
           message.success("Datos enviados correctamente!");
+          setTimeout(() => {
+            loading.value = false;
+          }, 1000);
         }
       } catch (error) {
         console.error(error);
@@ -404,6 +418,8 @@
                 class="h-20 w-full text-2xl flex items-center justify-center"
                 type="primary"
                 @click="sendInfo"
+                :disabled="!form || loading"
+                :loading="loading"
               >
                 Enviar informacion
               </a-button>
@@ -411,6 +427,7 @@
                 v-if="current > 0"
                 class="h-20 w-full text-2xl flex items-center justify-center"
                 @click="prev"
+                :disabled="loading"
                 ><ArrowLeftOutlined
               /></a-button>
             </div>
