@@ -17,7 +17,17 @@ export const fetchAddData = async (formData) => {
   const url = `${API}key/`;
   try {
     const response = await axios.post(url, formData);
-    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error during post request:", error.response.data);
+  }
+};
+
+export const fetchEditData = async (uuid, data) => {
+  const url = `${API}key/edit/${uuid}`;
+  try {
+    const response = await axios.put(url, data);
+    return response.data;
   } catch (error) {
     console.error("Error during post request:", error.response.data);
   }
